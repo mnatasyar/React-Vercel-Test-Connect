@@ -1,36 +1,41 @@
-name: Deploy to Cloud Run
+name: Deploy React to Cloud Run
 
 on:
   push:
     branches:
-      - master
+      - main # Trigger hanya untuk branch main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout kode dari repository
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0
+      # Step 2: Setup Google Cloud SDK
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Authenticate Docker to GCP
-        run: gcloud auth configure-docker
-
-      - name: Build and push Docker image
+      # Step 3: Build Docker image
+      - name: Build Docker Image
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:$GITHUB_SHA .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:$GITHUB_SHA
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:latest .
 
+      # Step 4: Push Docker image ke Container Registry
+      - name: Push to Container Registry
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:latest
+
+      # Step 5: Deploy ke Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy react-app \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:$GITHUB_SHA \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:latest \
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated
