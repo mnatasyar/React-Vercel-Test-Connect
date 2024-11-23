@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout kode dari repository
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -34,7 +33,7 @@ jobs:
       # Step 5: Deploy ke Cloud Run
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy react-app \
+          gcloud run deploy react-test-backend \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-app:latest \
             --platform managed \
             --region us-central1 \
