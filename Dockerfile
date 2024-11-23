@@ -10,8 +10,10 @@ RUN apk add --no-cache python3 make g++
 # Salin package.json dan package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies termasuk devDependencies
 RUN npm ci
+# Install terser secara eksplisit
+RUN npm install --save-dev terser
 
 # Salin seluruh kode sumber
 COPY . .
@@ -26,7 +28,7 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Salin konfigurasi nginx
-COPY default.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 8080 untuk Cloud Run
 EXPOSE 8080

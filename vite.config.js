@@ -12,22 +12,13 @@ export default defineConfig({
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    // Mengoptimalkan build
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        drop_console: true, // Menghapus console.log di production
-        drop_debugger: true,
-      },
-    },
-    // Mengatur chunk size
+    // Menggunakan esbuild minifier sebagai alternatif
+    minify: "esbuild",
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ["react", "react-dom"],
-          // Tambahkan library lain yang besar di sini
         },
-        // Mengatur nama file output
         entryFileNames: "assets/[name].[hash].js",
         chunkFileNames: "assets/[name].[hash].js",
         assetFileNames: "assets/[name].[hash].[ext]",
@@ -35,7 +26,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8080, // Menyesuaikan dengan port Cloud Run
-    host: true, // Mengizinkan akses dari luar
+    port: 8080,
+    host: true,
   },
 });
