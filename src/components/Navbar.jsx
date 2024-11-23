@@ -28,12 +28,6 @@ const Navbar = () => {
                 >
                   Register
                 </Link>
-                <Link
-                  to="/recommend"
-                  className="text-blue-500 hover:text-blue-700"
-                >
-                  Course Recommendations
-                </Link>
               </>
             ) : (
               <>
@@ -48,6 +42,12 @@ const Navbar = () => {
                   className="text-blue-500 hover:text-blue-700"
                 >
                   Profile
+                </Link>
+                <Link
+                  to="/recommend"
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  Course Recommendations
                 </Link>
                 <button
                   onClick={handleLogout}

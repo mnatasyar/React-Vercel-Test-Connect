@@ -9,11 +9,14 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProtectedData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/protected", {
-          headers: {
-            Authorization: token,
-          },
-        });
+        const response = await fetch(
+          "https://capstone-project-442014.et.r.appspot.com/protected",
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
 
         const data = await response.json();
         if (!response.ok)

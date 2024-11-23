@@ -1,19 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import CourseCard from "./CourseCard";
 
-const API_URL = "https://belajar-cloud-computing-438003.uc.r.appspot.com/api";
+const API_URL =
+  "https://course-recommendation-api-866939629489.asia-southeast2.run.app/api";
 
 const RecommendedCourse = () => {
   const { token } = useAuth();
-  const [options, setOptions] = useState({
-    subcategories: [],
-    courseTypes: [],
-    durations: [],
-  });
   const [formData, setFormData] = useState({
     subcategory: "",
-    courseType: "",
+    course_type: "", // Disesuaikan dengan API baru
     duration: "",
   });
   const [recommendations, setRecommendations] = useState(null);
@@ -21,43 +17,48 @@ const RecommendedCourse = () => {
   const [error, setError] = useState("");
   const [favorites, setFavorites] = useState({});
 
-  useEffect(() => {
-    fetchOptions();
-    if (token) {
-      fetchFavorites();
-    }
-  }, [token]);
+  const subcategories = [
+    "Algorithms",
+    "Animal Health",
+    "Basic Science",
+    "Business Essentials",
+    "Business Strategy",
+    "Chemistry",
+    "Cloud Computing",
+    "Computer Security and Networks",
+    "Data Analysis",
+    "Data Management",
+    "Design and Product",
+    "Electrical Engineering",
+    "Entrepreneurship",
+    "Finance",
+    "Health Informatics",
+    "Healthcare Management",
+    "History",
+    "Leadership and Management",
+    "Machine Learning",
+    "Marketing",
+    "Mechanical Engineering",
+    "Mobile and Web Development",
+    "Music and Art",
+    "Nutrition",
+    "Patient Care",
+    "Personal Development",
+    "Probability and Statistics",
+    "Psychology",
+    "Public Health",
+    "Research",
+    "Software Development",
+  ];
 
-  const fetchOptions = async () => {
-    try {
-      const response = await fetch(`${API_URL}/options`);
-      if (!response.ok) throw new Error("Failed to fetch options");
-      const data = await response.json();
-      setOptions(data);
-    } catch (err) {
-      console.error("Error fetching options:", err);
-      setError("Failed to load options");
-    }
-  };
+  const courseTypes = [
+    "Course",
+    "Professional Certificate",
+    "Project",
+    "Specialization",
+  ];
 
-  const fetchFavorites = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/favorites", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch favorites");
-      const data = await response.json();
-      const favMap = {};
-      data.forEach((fav) => {
-        favMap[fav.course_id] = true;
-      });
-      setFavorites(favMap);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    }
-  };
+  const durations = Array.from({ length: 35 }, (_, i) => i + 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,11 +71,7 @@ const RecommendedCourse = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          subcategory: formData.subcategory,
-          courseType: formData.courseType,
-          duration: parseInt(formData.duration),
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -83,7 +80,18 @@ const RecommendedCourse = () => {
       }
 
       const data = await response.json();
-      setRecommendations(data);
+      setRecommendations({
+        category: data.predicted_category,
+        recommendations: data.recommended_courses.map((course, index) => ({
+          id: index.toString(), // Generate temporary id
+          title: course.title,
+          shortIntro: course.short_intro,
+          url: course.url,
+          category: data.predicted_category,
+          subCategory: formData.subcategory,
+          duration: parseInt(formData.duration),
+        })),
+      });
     } catch (err) {
       console.error("Error submitting form:", err);
       setError(err.message);
@@ -107,7 +115,7 @@ const RecommendedCourse = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/favorites/toggle",
+        "https://capstone-project-442014.et.r.appspot.com/api/favorites/toggle",
         {
           method: "POST",
           headers: {
@@ -120,7 +128,11 @@ const RecommendedCourse = () => {
 
       if (!response.ok) throw new Error("Failed to toggle favorite");
 
-      await fetchFavorites();
+      // Update local favorites state
+      setFavorites((prev) => ({
+        ...prev,
+        [course.id]: !prev[course.id],
+      }));
     } catch (error) {
       console.error("Error toggling favorite:", error);
       setError("Failed to update favorite status");
@@ -142,7 +154,7 @@ const RecommendedCourse = () => {
             required
           >
             <option value="">Select your interest</option>
-            {options.subcategories.map((sub) => (
+            {subcategories.map((sub) => (
               <option key={sub} value={sub}>
                 {sub}
               </option>
@@ -153,14 +165,14 @@ const RecommendedCourse = () => {
         <div>
           <label className="block mb-2">Course Type</label>
           <select
-            name="courseType"
-            value={formData.courseType}
+            name="course_type"
+            value={formData.course_type}
             onChange={handleChange}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Select course type</option>
-            {options.courseTypes.map((type) => (
+            {courseTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
               </option>
@@ -178,7 +190,7 @@ const RecommendedCourse = () => {
             required
           >
             <option value="">Select duration</option>
-            {options.durations.map((duration) => (
+            {durations.map((duration) => (
               <option key={duration} value={duration}>
                 {duration}
               </option>

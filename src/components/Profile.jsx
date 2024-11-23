@@ -32,11 +32,14 @@ const Profile = () => {
 
   const fetchFavoriteCourses = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/favorites", {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await fetch(
+        "https://capstone-project-442014.et.r.appspot.com/api/favorites",
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
       if (!response.ok) throw new Error("Failed to fetch favorite courses");
       const data = await response.json();
       setFavoriteCourses(data);
@@ -82,7 +85,7 @@ const Profile = () => {
   const handleToggleFavorite = async (course) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/favorites/toggle",
+        "https://capstone-project-442014.et.r.appspot.com/api/favorites/toggle",
         {
           method: "POST",
           headers: {
