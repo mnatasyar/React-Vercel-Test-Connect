@@ -1,41 +1,28 @@
-# Build stage
-FROM node:18-alpine as builder
+# Gunakan image Node.js sebagai base image
+FROM node:16 AS build
 
 # Set working directory
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
-
-# Salin package.json dan package-lock.json
+# Salin package.json dan install dependencies
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies termasuk devDependencies
-RUN npm ci
-# Install terser secara eksplisit
-RUN npm install --save-dev terser
-
-# Salin seluruh kode sumber
+# Salin semua file dan build aplikasi
 COPY . .
-
-# Build aplikasi
 RUN npm run build
 
-# Production stage
+# Gunakan image Nginx untuk melayani aplikasi
 FROM nginx:alpine
 
-# Salin hasil build
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Salin hasil build ke Nginx
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Salin konfigurasi nginx
+# Salin file konfigurasi Nginx
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 8080 untuk Cloud Run
+# Expose port yang digunakan oleh Cloud Run
 EXPOSE 8080
 
-# Ganti user nginx untuk keamanan
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chmod -R 755 /usr/share/nginx/html
-
-# Jalankan nginx
+# Jalankan Nginx
 CMD ["nginx", "-g", "daemon off;"]
