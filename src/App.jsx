@@ -13,7 +13,7 @@ import Profile from "./components/Profile";
 import Navbar from "./components/Navbar";
 import { PublicRoute, PrivateRoute } from "./components/AuthGuard";
 import RecommendedCourse from "./components/RecommendedCourse";
-import ChatBot from "./components/ChatBot";
+import ChatBot from "./components/ChatBot/ChatBot.jsx";
 
 const App = () => {
   return (
