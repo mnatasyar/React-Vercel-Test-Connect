@@ -8,8 +8,8 @@ const API_URL =
 const RecommendedCourse = () => {
   const { token } = useAuth();
   const [formData, setFormData] = useState({
-    subcategory: "",
-    course_type: "", // Disesuaikan dengan API baru
+    interest: "", // Sesuai dengan field baru
+    course_type: "",
     duration: "",
   });
   const [recommendations, setRecommendations] = useState(null);
@@ -17,12 +17,13 @@ const RecommendedCourse = () => {
   const [error, setError] = useState("");
   const [favorites, setFavorites] = useState({});
 
-  const subcategories = [
+  // Updated interests list sesuai HTML
+  const interests = [
     "Algorithms",
     "Animal Health",
     "Basic Science",
     "Business Essentials",
-    "Business Strategy",
+    "Bu siness Strategy",
     "Chemistry",
     "Cloud Computing",
     "Computer Security and Networks",
@@ -58,7 +59,14 @@ const RecommendedCourse = () => {
     "Specialization",
   ];
 
-  const durations = Array.from({ length: 35 }, (_, i) => i + 1);
+  // Updated durations sesuai HTML
+  const durations = [
+    { value: "1", label: "1-4 weeks" },
+    { value: "12", label: "5-12 weeks" },
+    { value: "24", label: "13-24 weeks" },
+    { value: "39", label: "25-40 weeks" },
+    { value: "60", label: "41-60 weeks" },
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +79,11 @@ const RecommendedCourse = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          interest: formData.interest, // Menggunakan field interest
+          course_type: formData.course_type,
+          duration: formData.duration,
+        }),
       });
 
       if (!response.ok) {
@@ -83,13 +95,12 @@ const RecommendedCourse = () => {
       setRecommendations({
         category: data.predicted_category,
         recommendations: data.recommended_courses.map((course, index) => ({
-          id: index.toString(), // Generate temporary id
+          id: index.toString(),
           title: course.title,
           shortIntro: course.short_intro,
           url: course.url,
           category: data.predicted_category,
-          subCategory: formData.subcategory,
-          duration: parseInt(formData.duration),
+          interest: formData.interest,
         })),
       });
     } catch (err) {
@@ -128,7 +139,6 @@ const RecommendedCourse = () => {
 
       if (!response.ok) throw new Error("Failed to toggle favorite");
 
-      // Update local favorites state
       setFavorites((prev) => ({
         ...prev,
         [course.id]: !prev[course.id],
@@ -147,16 +157,16 @@ const RecommendedCourse = () => {
         <div>
           <label className="block mb-2">Interest</label>
           <select
-            name="subcategory"
-            value={formData.subcategory}
+            name="interest"
+            value={formData.interest}
             onChange={handleChange}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Select your interest</option>
-            {subcategories.map((sub) => (
-              <option key={sub} value={sub}>
-                {sub}
+            {interests.map((interest) => (
+              <option key={interest} value={interest}>
+                {interest}
               </option>
             ))}
           </select>
@@ -181,7 +191,7 @@ const RecommendedCourse = () => {
         </div>
 
         <div>
-          <label className="block mb-2">Duration (weeks)</label>
+          <label className="block mb-2">Duration (in weeks)</label>
           <select
             name="duration"
             value={formData.duration}
@@ -191,8 +201,8 @@ const RecommendedCourse = () => {
           >
             <option value="">Select duration</option>
             {durations.map((duration) => (
-              <option key={duration} value={duration}>
-                {duration}
+              <option key={duration.value} value={duration.value}>
+                {duration.label}
               </option>
             ))}
           </select>

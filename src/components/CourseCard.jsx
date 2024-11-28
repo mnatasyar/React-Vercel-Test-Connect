@@ -29,9 +29,10 @@ const CourseCard = ({ course, isFavorited, onToggleFavorite }) => {
       <p className="text-gray-600 mb-3">{course.shortIntro}</p>
       <div className="flex flex-wrap justify-between items-center gap-2">
         <div className="flex flex-col text-sm text-gray-500">
-          <span>Duration: {course.duration} weeks</span>
           <span className="text-xs">
-            {course.category} - {course.subCategory}
+            <span className="text-xs">
+              {course.category} - {course.interest}
+            </span>
           </span>
         </div>
         <a

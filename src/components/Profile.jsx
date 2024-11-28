@@ -1,4 +1,3 @@
-// components/Profile.jsx
 import { useState, useEffect } from "react";
 import { profileService } from "../services/api";
 import CourseCard from "./CourseCard";
@@ -242,11 +241,10 @@ const Profile = () => {
                 course={{
                   id: course.course_id,
                   title: course.course_title,
-                  shortIntro: `${course.category} - ${course.sub_category}`,
+                  shortIntro: `${course.category} - ${course.interest}`,
                   url: course.course_url,
-                  duration: course.duration,
                   category: course.category,
-                  subCategory: course.sub_category,
+                  interest: course.interest,
                 }}
                 isFavorited={true}
                 onToggleFavorite={handleToggleFavorite}
